@@ -1,0 +1,20 @@
+{
+    "name": "soft-tech-mx/mysql-connection",
+    "description": "Paquete PHP para realizar conexion con mysql de forma nativa usando un estilo orientado a objetos.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "SoftTechMX\\MysqlConnection\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Bayron Vazquez",
+            "email": "bayronnjonathan@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0"
+    }
+}
