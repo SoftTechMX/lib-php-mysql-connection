@@ -24,7 +24,7 @@ $localhost->connect();
 En el ejemplo de abajo podemos ver como realizar una inserción de un registro con tan solo tres lineas de código. Si no conoces los Prepared 
 Statements te recomiendo que leas este articulo de la pagina oficial de [https://www.php.net/manual/es/mysqli-stmt.bind-param.php](https://www.php.net/manual/es/mysqli-stmt.bind-param.php)
 ```PHP
-$BIND_PARAMS = array("sid","Atun",500, 5.55);
+$BIND_PARAMS = array("Atun",500, 5.55);
 $SQL_INSERT = "INSERT INTO productos(nombre, cantidad, precio) VALUES(?,?,?)";
 $localhost->execute( $SQL_INSERT, $BIND_PARAMS);
 ```
@@ -32,7 +32,7 @@ $localhost->execute( $SQL_INSERT, $BIND_PARAMS);
 ### DELETE
 En el ejemplo que se muestra a continuación se puede observar como borrar un registro, igual utilizando solo tres lineas de código.
 ```PHP
-$BIND_PARAMS = array("s","111");
+$BIND_PARAMS = array("111");
 $SQL_DELETE = "DELETE FROM test WHERE ID = ?";
 $localhost->execute( $SQL_DELETE, $BIND_PARAMS);
 ```
@@ -45,7 +45,7 @@ $localhost->execute( $SQL_DELETE, null);
 ### SELECT
 Ejemplo con parametros
 ```PHP
-$BIND_PARAMS = array("s","111");
+$BIND_PARAMS = array("111");
 $SQL_SELECT = "SELECT * FROM test WHERE ID = ?";
 $resultset = $localhost->execute( $SQL_SELECT, $BIND_PARAMS);
 
@@ -79,4 +79,25 @@ else
     echo "NO HAY NINGUN RESULTADO RETORNADO <BR>";
 }
 $resultset->close();
+```
+
+otro ejemplo
+```php
+$db = new MySQLConnection();
+$db->setHost('127.0.0.1');
+$db->setUsername('root');
+$db->setPassword('secret');
+$db->setDatabase('mi_db');
+
+try {
+    $db->connect();
+    $result = $db->execute('SELECT * FROM users WHERE id = ?', [$userId]);
+
+    foreach ($result as $row) {
+        // ...
+    }
+} catch (\mysqli_sql_exception $e) {
+    // Manejo de error real, no un echo suelto
+    echo "Error de base de datos: " . $e->getMessage();
+}
 ```
