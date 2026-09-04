@@ -2,135 +2,106 @@
 
 namespace SoftTechMX;
 
+use mysqli;
+use mysqli_sql_exception;
+use mysqli_stmt;
+
 class MySQLConnection
 {
-    private $IP;
-    private $PASSWORD;
-    private $USERNAME;
-    private $DATABASE;
-    private $PORT;
-    public $Connection;
+    private ?string $host = null;
+    private ?string $password = null;
+    private ?string $username = null;
+    private ?string $database = null;
+    
+    private int $port = 3306;
 
-    public function __construct()
+    public ?mysqli $connection = null;
+
+    public function setHost(string $host): void
     {
-        $this->IP       = null;
-        $this->PASSWORD = null;
-        $this->USERNAME = null;
-        $this->DATABASE = null;
-        $this->PORT     = 3306;
+        $this->host = $host;
     }
 
-    public function setIP( $IP )
+    public function getHost(): ?string
     {
-        $this->IP = $IP;
+        return $this->host;
     }
 
-    public function getIP()
+    public function setPassword(string $password): void
     {
-        return $this->IP;
+        $this->password = $password;
     }
 
-    public function setPassword( $PASSWORD )
+    public function getPassword(): ?string
     {
-        $this->PASSWORD = $PASSWORD;
+        return $this->password;
     }
 
-    public function getPassword()
+    public function setUsername(string $username): void
     {
-        return $this->PASSWORD;
+        $this->username = $username;
     }
 
-    public function setUsername( $USERNAME )
+    public function getUsername(): ?string
     {
-        $this->USERNAME = $USERNAME;
+        return $this->username;
     }
 
-    public function getUsername()
+    public function setDatabase(string $database): void
     {
-        return $this->USERNAME;
+        $this->database = $database;
     }
 
-    public function setDatabase( $DATABASE )
+    public function getDatabase(): ?string
     {
-        $this->DATABASE = $DATABASE;
+        return $this->database;
     }
 
-    public function getDatabase()
+    public function setPort(int $port): void
     {
-        return $this->DATABASE;
+        $this->port = $port;
     }
 
-    public function setPort( $PORT )
+    public function getPort(): int
     {
-        $this->PORT = $PORT;
+        return $this->port;
     }
 
-    public function getPort()
+    /**
+     * @throws mysqli_sql_exception si la conexión falla (comportamiento nativo desde PHP 8.1)
+     */
+    public function connect(): bool
     {
-        return $this->PORT;
-    }
-
-    public function connect()
-    {
-
-        $this->Connection = new mysqli
-        (
-            $this->IP,
-            $this->USERNAME,
-            $this->PASSWORD,
-            $this->DATABASE,
-            $this->PORT
+        $this->connection = new mysqli(
+            $this->host,
+            $this->username,
+            $this->password,
+            $this->database,
+            $this->port
         );
 
-        // WE CHEACK THE CONNECTION STATUS
-        if ($this->Connection->connect_error)
-        {
-            echo  $this->Connection->connect_error;
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return true;
     }
 
-    public function execute($SQL, $BIND_PARAMS )
+    /**
+     * @param string $sql Query con placeholders (?)
+     * @param array $params Valores a bindear, en orden
+     * @throws mysqli_sql_exception si prepare() o execute() fallan
+     */
+    public function execute(string $sql, array $params = []): \mysqli_result|bool
     {
-        if( $STMT = $this->Connection->prepare( $SQL ) )
-        {
+        $stmt = $this->connection->prepare($sql);
 
-            $tmp = array();
-            if( is_array($BIND_PARAMS) && $BIND_PARAMS != null )
-            {
-                
-                foreach($BIND_PARAMS as $key => $value)
-                    $tmp[$key] = &$BIND_PARAMS[$key];
-                call_user_func_array(array($STMT, 'bind_param'), $tmp);
-            }
+        $stmt->execute($params);
 
-            
-            if( $STMT->execute() )
-            {
-                $ResultSet = $STMT->get_result();
-                return $ResultSet;
-            }
-            else
-            {
-                echo "Erro en execute()";
-            }
-            $STMT->close();
-        }
-        else
-        {
-            echo "Fallo al prepara";
-        }
+        $result = $stmt->get_result();
+        $stmt->close();
+
+        return $result;
     }
 
     public function __destruct()
     {
-        if($this->Connection != null )
-        {
-            $this->Connection->close();
-        }
+        $this->connection?->close();
     }
 }
