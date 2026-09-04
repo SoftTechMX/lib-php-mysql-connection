@@ -1,5 +1,7 @@
 <?php
 
+namespace SoftTechMX;
+
 class MySQLConnection
 {
     private $IP;
